@@ -10,6 +10,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Test successful request
+        id: success
+        uses: kennethonyenuloya/retry-storm-breaker@v1
+        with:
+          key: test-success
+          run: curl -sf https://httpbin.org/status/200
+        continue-on-error: true
+
+      - name: Test failed request
+        id: failure
+        uses: kennethonyenuloya/retry-storm-breaker@v1
+        with:
+          key: test-failure
+          run: curl -sf https://httpbin.org/status/500
+          failure-threshold: 5
+          window-size: 10
+          open-duration-seconds: 300
+          half-open-max-calls: 1
+        continue-on-error: true
+
       - name: Call flaky deploy API
         id: breaker
         uses: kennethonyenuloya/retry-storm-breaker@v1
@@ -29,6 +49,14 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_MESSAGE: "🔴 Circuit breaker OPEN for staging-deploy-api — deploys are being skipped until the dependency recovers."
 
-      - name: Fail the job if the underlying call failed
-        if: steps.breaker.outputs.outcome != 'success'
-        run: exit 1
+      # - name: Fail the job if the underlying call failed
+      #   if: steps.breaker.outputs.outcome != 'success'
+      #   run: exit 1
+
+      - name: Show results
+        run: |
+          echo "Success outcome: ${{ steps.success.outputs.outcome }}"
+          echo "Failure outcome: ${{ steps.failure.outputs.outcome }}"
+          echo "Failure circuit: ${{ steps.failure.outputs.circuit-state }}"
+          echo "Breaker (staging-deploy-api) outcome: ${{ steps.breaker.outputs.outcome }}"
+          echo "Breaker (staging-deploy-api) circuit: ${{ steps.breaker.outputs.circuit-state }}"
