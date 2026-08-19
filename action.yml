@@ -72,5 +72,5 @@ outputs:
     description: "Number of execution attempts made in this step (0 if the circuit was open and the command was skipped)."
 
 runs:
-  using: "node20"
+  using: "node24"
   main: "dist/index.js"
