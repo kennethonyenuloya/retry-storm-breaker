@@ -1,8 +1,5 @@
 name: "Retry-Storm Circuit Breaker"
-description: >
-  A circuit breaker for CI steps that remembers failures across workflow
-  runs. Stops retry storms from amplifying upstream outages instead of
-  just retrying-with-backoff inside a single job.
+description: "A circuit breaker for CI steps that remembers failures across workflow runs, stopping retry storms before they amplify."
 author: "Kenneth Onyenuloya"
 branding:
   icon: "shield-off"
