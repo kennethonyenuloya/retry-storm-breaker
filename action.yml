@@ -1,0 +1,79 @@
+name: "Retry-Storm Circuit Breaker"
+description: >
+  A circuit breaker for CI steps that remembers failures across workflow
+  runs. Stops retry storms from amplifying upstream outages instead of
+  just retrying-with-backoff inside a single job.
+author: "Kenneth Onyenuloya"
+branding:
+  icon: "shield-off"
+  color: "red"
+
+inputs:
+  run:
+    description: "Shell command to execute (the step being protected)."
+    required: true
+  key:
+    description: >
+      Stable identifier for this breaker's state, e.g. "deploy-staging-api".
+      Use the same key across runs/jobs that share the same upstream
+      dependency so state carries over correctly.
+    required: true
+  shell:
+    description: "Shell to run the command with."
+    required: false
+    default: "bash"
+  failure-threshold:
+    description: "Failures within the rolling window needed to trip the breaker open."
+    required: false
+    default: "5"
+  window-size:
+    description: "Number of most recent calls considered for the failure threshold."
+    required: false
+    default: "10"
+  open-duration-seconds:
+    description: "How long the breaker stays open before probing again."
+    required: false
+    default: "300"
+  half-open-max-calls:
+    description: "Number of successful probe calls required to fully close the breaker again."
+    required: false
+    default: "1"
+  backoff-base-ms:
+    description: "Base delay in ms for jittered exponential backoff between in-attempt retries."
+    required: false
+    default: "1000"
+  backoff-max-retries:
+    description: "Number of retries within a single breaker-permitted attempt (pre-breaker resilience for transient blips)."
+    required: false
+    default: "3"
+  jitter:
+    description: "Whether to randomize backoff delays (full jitter) to avoid synchronized retry spikes."
+    required: false
+    default: "true"
+  fail-on-open:
+    description: "Whether the step should fail (true) or just warn (false) when the circuit is open and the command is skipped."
+    required: false
+    default: "true"
+  otel-endpoint:
+    description: >
+      Optional OTLP/HTTP endpoint (e.g. https://otel-collector.example.com)
+      to receive a span for this invocation. Left empty by default — no
+      network calls are made unless you set this.
+    required: false
+    default: ""
+  otel-headers:
+    description: "Optional newline-separated 'Header: value' pairs sent with the OTel export (e.g. for auth)."
+    required: false
+    default: ""
+
+outputs:
+  outcome:
+    description: "One of: success, failure, circuit-open."
+  circuit-state:
+    description: "Breaker state after this run: closed, open, or half-open. Use this to branch into a notification step of your choice."
+  attempts:
+    description: "Number of execution attempts made in this step (0 if the circuit was open and the command was skipped)."
+
+runs:
+  using: "node20"
+  main: "dist/index.js"

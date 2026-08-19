@@ -1,0 +1,22 @@
+{
+  "name": "retry-storm-breaker",
+  "version": "1.0.0",
+  "description": "A stateful circuit breaker for GitHub Actions steps that remembers failures across workflow runs, preventing retry-storm amplification of upstream outages.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "ncc build src/main.ts -o dist --minify --source-map",
+    "test": "node --test dist-test/*.test.js || true"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@actions/cache": "^4.1.0",
+    "@actions/core": "^1.10.1",
+    "@actions/exec": "^1.1.1",
+    "@actions/http-client": "^2.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@vercel/ncc": "^0.38.1",
+    "typescript": "^5.5.0"
+  }
+}
