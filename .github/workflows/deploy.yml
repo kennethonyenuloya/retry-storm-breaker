@@ -15,7 +15,7 @@ jobs:
         uses: kennethonyenuloya/retry-storm-breaker@v1
         with:
           key: test-success
-          run: curl -sf https://httpbin.org/status/200
+          run: curl -fsS https://httpbingo.org/get
         continue-on-error: true
 
       - name: Test failed request
@@ -24,9 +24,9 @@ jobs:
         with:
           key: test-failure
           run: curl -sf https://httpbin.org/status/500
-          failure-threshold: 5
-          window-size: 10
-          open-duration-seconds: 300
+          failure-threshold: 1 # 5 for production, but we want to trip the breaker quickly for testing
+          window-size: 1 # 10 for production, but we want to trip the breaker quickly for testing
+          open-duration-seconds: 10 # 300
           half-open-max-calls: 1
         continue-on-error: true
 
@@ -36,9 +36,9 @@ jobs:
         with:
           key: staging-deploy-api
           run: curl -sf https://staging-deploy.example.com/trigger
-          failure-threshold: 5
-          window-size: 10
-          open-duration-seconds: 300
+          failure-threshold: 1 # 5 for production, but we want to trip the breaker quickly for testing
+          window-size: 1 # 10 for production, but we want to trip the breaker quickly for testing
+          open-duration-seconds: 10 # 300 is recommended for production, use a longer duration for real-world scenarios that require more time to recover such as a database outage or a third-party service outage.
           half-open-max-calls: 1
         continue-on-error: true
 
