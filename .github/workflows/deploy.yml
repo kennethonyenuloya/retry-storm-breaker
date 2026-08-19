@@ -42,12 +42,12 @@ jobs:
           half-open-max-calls: 1
         continue-on-error: true
 
-      - name: Notify Slack when breaker trips
-        if: steps.breaker.outputs.circuit-state == 'open'
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_MESSAGE: "🔴 Circuit breaker OPEN for staging-deploy-api — deploys are being skipped until the dependency recovers."
+      # - name: Notify Slack when breaker trips
+      #   if: steps.breaker.outputs.circuit-state == 'open'
+      #   uses: rtCamp/action-slack-notify@v2
+      #   env:
+      #     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+      #     SLACK_MESSAGE: "🔴 Circuit breaker OPEN for staging-deploy-api — deploys are being skipped until the dependency recovers."
 
       # - name: Fail the job if the underlying call failed
       #   if: steps.breaker.outputs.outcome != 'success'
